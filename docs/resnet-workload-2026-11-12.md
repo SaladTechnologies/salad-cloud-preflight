@@ -107,6 +107,48 @@ This live run proves the healthy-node path with a real application. The earlier
 [percentage reallocation test](validation-2026-11-12.md) separately verified real
 IMDS reallocations for insufficient VRAM and insufficient default power.
 
+## Retest after user reallocation
+
+At 19:03:24 UTC, Salad recorded **Instance Reallocated by User**. The replacement
+used the same image, group configuration, and enforced thresholds. Its machine
+was `71423998-ce93-1755-8cdd-d8e1b517258b`, with instance
+`2b30c09c-9f0d-486f-97c7-f0bfc8cb40de`; both differ from the original placement.
+
+| Event | UTC time | Result |
+| --- | --- | --- |
+| Free-VRAM check | 19:07:45.132692 | 11722 / 12288 MiB = **95.3939%**, passed 95% minimum |
+| Power check | 19:07:45.182999 | 170 / 170 W = **100%**, passed 90% of default minimum |
+| Preflight launch decision | 19:07:45.183409 | Both checks passed on the first measurement |
+| Python application started | 19:07:45.347130 | PID 1 |
+| Model ready | 19:07:50.984717 | `cuda:0`, PID 1 |
+
+The first load attempt passed the five negative API cases and single-image
+inference, then failed with **HTTP 520 during concurrent requests**. The
+application remained ready on the same instance; its counters showed 34
+completed requests / 529 inferences afterward. The test aborted collection on
+the first error, so those server counters are not a count of successful client
+responses. The cause of the HTTP 520 remains unconfirmed.
+
+One diagnostic rerun captured every response without retries. It passed all
+**49 requests / 769 image inferences**, plus the same **five negative cases**.
+The concurrent portion took **7.86 seconds**, with median GPU time **16.63 ms
+per batch of 16** and median client time **551.19 ms**. Application counters
+increased by exactly 49 requests and 769 images. Health, instance identity,
+machine identity, and PID remained unchanged throughout the rerun and matched
+the Salad API afterward.
+
+This confirms that startup preflight runs again after placement changes and
+allows a qualifying node to launch the real workload. The healthy replacement
+did not request another reallocation. The passing rerun does not erase the
+earlier HTTP 520 or establish sustained request reliability. Power here measures
+the configured limit relative to the default, not actual draw or guaranteed
+sustained GPU performance. The group remains running and ready.
+
+Retest evidence is retained under
+`artifacts/resnet-workload-20261112/retest-20261112T190420Z/`, including
+`startup-events.json`, `first-load-failure.json`, `failure-logs.json`,
+`diagnostic-test.json`, `final-events.json`, and `verified.json`.
+
 ## Credentials and evidence
 
 The account API key stays in the ignored local `.env.salad`. The application uses
