@@ -1,0 +1,10 @@
+# Build the artifact image first: docker build -t salad-preflight:local .
+# Then use your application source as this Dockerfile's build context.
+FROM salad-preflight:local AS preflight
+FROM python:3.12-slim
+COPY --from=preflight /salad-preflight /usr/local/bin/salad-preflight
+WORKDIR /app
+COPY . /app
+# Install your application's own dependencies here.
+ENTRYPOINT ["/usr/local/bin/salad-preflight", "--"]
+CMD ["python", "app.py"]

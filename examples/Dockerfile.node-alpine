@@ -1,0 +1,9 @@
+FROM salad-preflight:local AS preflight
+FROM node:22-alpine
+COPY --from=preflight /salad-preflight /usr/local/bin/salad-preflight
+WORKDIR /app
+COPY . /app
+# Run your application's package installation/build here.
+# Preserve the base image's entrypoint behavior after preflight.
+ENTRYPOINT ["/usr/local/bin/salad-preflight", "--", "/usr/local/bin/docker-entrypoint.sh"]
+CMD ["node", "server.js"]

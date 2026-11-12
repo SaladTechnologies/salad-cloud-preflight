@@ -1,0 +1,9 @@
+# Supply your own existing image; no application code changes required.
+ARG CUSTOMER_IMAGE
+FROM salad-preflight:local AS preflight
+FROM ${CUSTOMER_IMAGE}
+COPY --from=preflight /salad-preflight /usr/local/bin/salad-preflight
+# Replace these with the original image's Entrypoint and Cmd exactly.
+# Setting ENTRYPOINT resets the inherited CMD, so always specify both.
+ENTRYPOINT ["/usr/local/bin/salad-preflight", "--", "/original-entrypoint.sh"]
+CMD ["original-application", "--original-argument"]

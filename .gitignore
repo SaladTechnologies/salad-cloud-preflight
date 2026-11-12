@@ -1,0 +1,12 @@
+/bin/
+/coverage.out
+.env
+.env.*
+!.env.example
+/.aws/
+/.codex/
+/.agents/
+/.ssh/
+/artifacts/
+__pycache__/
+*.pyc

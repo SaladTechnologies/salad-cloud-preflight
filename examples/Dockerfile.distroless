@@ -1,0 +1,7 @@
+# /path/to/customer-binary must be your own statically linked application.
+FROM salad-preflight:local AS preflight
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY --from=preflight /salad-preflight /salad-preflight
+COPY customer-binary /app
+ENTRYPOINT ["/salad-preflight", "--", "/app"]
+CMD []
