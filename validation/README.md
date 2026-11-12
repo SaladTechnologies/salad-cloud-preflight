@@ -5,6 +5,11 @@ HTTP service, generated-data download/upload fixtures, a CPU hashing benchmark,
 and a short CUDA memory workload for testing nonzero GPU utilization. These
 helpers are excluded from the reusable binary image.
 
+The separate [ResNet API example](../examples/resnet-api/README.md) runs a real
+CUDA application automatically after preflight. Its `workload_cloud.py` and
+`workload_test.py` helpers deploy a new group and test GPU image classification
+through the gateway, including concurrent requests.
+
 No checks run automatically. `/run` invokes the real wrapper with environment
 variables and `/bin/echo PREFLIGHT_APP_STARTED` as its application. Dry-run is
 forced unless the authenticated request explicitly sets `enforce: true`.

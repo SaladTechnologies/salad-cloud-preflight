@@ -55,6 +55,11 @@ provide your app, dependencies, base image, and original commands. They are not
 standalone demo applications. Pin your production base images by digest. The root
 Dockerfile exports only a binary; it has no application or default command.
 
+For a runnable GPU application, see the [ResNet image-classification API](examples/resnet-api/README.md).
+Its separate Dockerfile copies the published worker into a CUDA application image.
+The startup checks run before model loading, then the application serves real
+image inference requests. Deployment and load-test scripts target a separate Salad group.
+
 If the container group has a SaladCloud
 [startup probe](https://docs.salad.com/container-engine/explanation/infrastructure-platform/startup-probes),
 the preflight runs inside that probe's window, because the application has not
